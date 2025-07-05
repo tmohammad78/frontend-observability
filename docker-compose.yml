@@ -1,0 +1,73 @@
+services:
+  # React app service
+  frontend:
+    build:
+      context: ./contact-app
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    networks:
+      - monitoring
+
+  # NGINX service
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "3101:80" 
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf 
+    networks:
+      - monitoring
+    depends_on:
+      - frontend 
+
+  # Loki service for log storage (depends on NGINX)
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    networks:
+      - monitoring
+    depends_on:
+      - nginx 
+
+  # Promtail service for log collection
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - /var/log:/var/log
+      - ./logs/frontend:/logs/frontend
+      - promtail_data:/tmp
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - monitoring
+    depends_on:
+      - loki 
+
+  # Grafana service for visualizing logs
+  grafana:
+    image: grafana/grafana:10.4.1
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana  
+    networks:
+      - monitoring
+    depends_on:
+      - promtail
+
+volumes:
+  loki_data:
+  grafana_data:
+  promtail_data:
+
+networks:
+  monitoring:
+    driver: bridge
