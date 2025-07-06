@@ -9,7 +9,10 @@ export const onErrorCallback = (error: Error, info: { componentStack: string }) 
         body: JSON.stringify({
             streams: [
                 {
-                    stream: { level: 'error', error: error.toString() },
+                    stream: {
+                        level: 'error',
+                        error: error.toString()
+                    },
                     values: [
                         [String(timestamp), JSON.stringify({ error: error.toString(), info })],
                     ],

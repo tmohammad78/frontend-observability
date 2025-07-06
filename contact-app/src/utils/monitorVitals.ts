@@ -1,5 +1,5 @@
 // import { getLCP, getFID, getCLS, getFCP, getTTFB } from 'web-vitals';
-import { onLCP, onINP, onCLS } from 'web-vitals/attribution';
+import { onLCP, onINP, onCLS, onTTFB } from 'web-vitals/attribution';
 
 function sendToLoki(metric: any) {
     console.log(metric, 'dd');
@@ -15,16 +15,16 @@ function sendToLoki(metric: any) {
                     level: 'info', 
                     metric: metric.name,
                     url: pageUrl,
-                    score: metricValue,
+                    score: String(metricValue),
                     id: metric.id || ''
                 },
                 values: [
                     [String(timestamp), JSON.stringify({
                         metric: metric.name,
                         url: pageUrl,
-                        score: metricValue,
+                        score: String(metricValue),
                         details: metric,
-                        timestamp: Date.now(),
+                        timestamp: String(Date.now()),
                         /// uun
                     })],
                 ],
@@ -51,7 +51,8 @@ function sendToLoki(metric: any) {
 }
 
 export function initVitalsMonitoring() {
-    onCLS(sendToLoki);
-    onINP(sendToLoki);
-    onLCP(sendToLoki);
+    onCLS(sendToLoki, { reportAllChanges: true });
+    onINP(sendToLoki, { reportAllChanges: true });
+    onLCP(sendToLoki, { reportAllChanges: true });
+    onTTFB(sendToLoki, { reportAllChanges: true });
 }
