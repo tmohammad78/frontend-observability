@@ -1,4 +1,3 @@
-// import { getLCP, getFID, getCLS, getFCP, getTTFB } from 'web-vitals';
 import { onLCP, onINP, onCLS, onTTFB } from 'web-vitals/attribution';
 
 function sendToLoki(metric: any) {

@@ -4,9 +4,9 @@ import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { onErrorCallback } from './utils/onErrorCallback.ts';
 import ErrorFallback from './components/ErrorFallback.tsx';
 import { initVitalsMonitoring } from './utils/monitorVitals.ts';
-import ErrorThrower from './components/ErrorThrower.tsx';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Card from './components/Card';
+import ErrorThrower from './components/ErrorThrower.tsx';
 
 function CardListPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -96,10 +96,6 @@ function App() {
     initVitalsMonitoring();
   }, []);
 
-  function throwError() {
-    throw new Error('Simulated error!');
-  }
-
   return (
     <ReactErrorBoundary
       FallbackComponent={ErrorFallback}
@@ -109,6 +105,7 @@ function App() {
         <Routes>
           <Route path="/" element={<CardListPage />} />
           <Route path="/detail/:id" element={<CardDetailPage />} />
+          <Route path="/error" element={<ErrorThrower />} />
         </Routes>
       </Router>
     </ReactErrorBoundary>
