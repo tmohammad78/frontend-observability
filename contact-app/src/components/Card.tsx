@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface CardProps {
@@ -6,8 +5,10 @@ interface CardProps {
   title: string;
   description: string;
 }
+import { withFaroProfiler } from '@grafana/faro-react';
 
-const Card: React.FC<CardProps> = ({ id, title, description }) => {
+
+const Card = ({ id, title, description }: CardProps) => {
   const navigate = useNavigate();
 
   return (
@@ -22,4 +23,4 @@ const Card: React.FC<CardProps> = ({ id, title, description }) => {
   );
 };
 
-export default Card; 
+export default withFaroProfiler(Card);
