@@ -1,5 +1,4 @@
 services:
-  # React app service
   frontend:
     build:
       context: ./contact-app
@@ -9,7 +8,6 @@ services:
     networks:
       - observability
 
-  # NGINX service
   nginx:
     image: nginx:alpine
     ports:
@@ -20,25 +18,7 @@ services:
       - observability
     depends_on:
       - frontend 
-      - loki
 
-  alloy:
-    image: grafana/alloy:latest
-    volumes:
-      - ./alloy/config.alloy:/etc/alloy/config.alloy
-    command: ["run", "/etc/alloy/config.alloy"]
-    ports:
-      - "12345:12345"
-    networks:
-      - observability
-
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - observability
 networks:
   observability:
     driver: bridge

@@ -3,15 +3,11 @@ import './App.css'
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { onErrorCallback } from './utils/onErrorCallback.ts';
 import ErrorFallback from './components/ErrorFallback.tsx';
-// import { initVitalsMonitoring } from './utils/monitorVitals.ts';
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Card from './components/Card';
 import ErrorThrower from './components/ErrorThrower.tsx';
 import "./monitoring.ts"
-import { initWebVitals } from './utils/vitals.ts';
-import { initGlobalErrorHandling } from './utils/globalErrorHandler.ts';
-import { overrideConsole } from './utils/overrideConsole.ts';
-import { overrideFetch } from './utils/monitorFetch.ts';
+
 function CardListPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,12 +92,6 @@ function CardDetailPage() {
 }
 
 function App() {
-  useEffect(() => {
-    initWebVitals();
-    // initGlobalErrorHandling();
-    // overrideConsole();
-    // overrideFetch();
-  }, []);
   return (
     <ReactErrorBoundary
       FallbackComponent={ErrorFallback}
