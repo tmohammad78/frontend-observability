@@ -13,12 +13,14 @@ import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
 const initFaro = () => {
     initializeFaro({
-        url: `http://localhost:8027/collect`,
+        url: `http://localhost:3101/collect`,
         app: {
             name: 'frontend-app',
             version: '1.0.0',
             environment: 'development',
         },
+        trackResources: true,
+        trackGeolocation: true,
         instrumentations: [
             ...getWebInstrumentations({
                 captureConsole: true,

@@ -5,7 +5,7 @@ import Card from './components/Card';
 import ErrorThrower from './components/ErrorThrower.tsx';
 import "./utils/monitoring.ts"
 import './App.css'
-import { FaroErrorBoundary, FaroRoutes } from '@grafana/faro-react';
+import { faro, FaroErrorBoundary, FaroRoutes } from '@grafana/faro-react';
 import initFaro from './utils/monitoring.ts';
 
 
@@ -13,12 +13,16 @@ function CardListPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [show, setShow] = useState(false);
+  const [src, setSrc] = useState('');
 
   useEffect(() => {
     setLoading(true);
-    fetch('https://jsonplaceholder.typicode.com/users')
+    const url = 'https://jsonplaceholder.typicode.com/users';
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch');
+        faro.api.pushEvent('Request completed', { url });
         return res.json();
       })
       .then((data) => {
@@ -26,17 +30,63 @@ function CardListPage() {
         setLoading(false);
       })
       .catch((err) => {
+        console.log(err,'dd');
+        
+        faro.api.pushEvent('Request failed', { url });
         setError(err.message);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    // Simulate a recoverable error
+    console.error(new Error("Simulated soft error from CardListPage"));
+  }, []);
+
+  
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSrc('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80');
+    }, 5000); // Delay image load by 5 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (loading) return (
+    <div style={{ width: "400px", height: "400px" }}>
+      This is loading
+    </div>
+  )
   if (error) return <div>Error: {error}</div>;
 
+  const handleClick = () => {
+    const start = Date.now();
+    // Block main thread for 6000ms
+    while (Date.now() - start < 6000) {}
+    alert("Done blocking!");
+  };
+  
+  setTimeout(() => {
+    setShow(true)
+  }, 4000) 
+
+
+ 
   return (
     <div>
       <h2>User List</h2>
+      {show && (
+        <img
+          src={src}
+          alt="Mountain landscape"
+          width="1200"
+          height="800"
+          loading="eager"
+          style={{ backgroundColor: '#ccc' }} // optional placeholder color
+        />
+      )}
+      <button onClick={handleClick}>click me</button>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
         {items.map((item) => (
           <Card
@@ -60,9 +110,11 @@ function CardDetailPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
+    const url = `https://jsonplaceholder.typicode.com/users/${id}`
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch');
+        faro.api.pushEvent('Request completed', { url });
         return res.json();
       })
       .then((data) => {
@@ -70,6 +122,7 @@ function CardDetailPage() {
         setLoading(false);
       })
       .catch((err) => {
+        faro.api.pushEvent('Request failed', { url });
         setError(err.message);
         setLoading(false);
       });
@@ -96,7 +149,7 @@ initFaro();
 
 function App() {
   return (
-    <FaroErrorBoundary FallbackComponent={ErrorFallback}>
+    <FaroErrorBoundary fallback={(error, resetError) => <ErrorFallback error={error} resetErrorBoundary={resetError} />}>
       <Router>
         <FaroRoutes>
           <Route path="/" element={<CardListPage />} />
