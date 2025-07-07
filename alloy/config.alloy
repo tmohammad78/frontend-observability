@@ -1,0 +1,36 @@
+faro.receiver "default" {
+  server {
+    listen_address = "0.0.0.0"
+    listen_port    = 12345
+  }
+}
+
+loki.relabel "default" {
+  input = faro.receiver.default.output
+
+  rule {
+    action = "set"
+    target_label = "job"
+    value = "faro_logs"
+  }
+
+  rule {
+    action = "set"
+    target_label = "app"
+    source_labels = ["__meta_faro_attributes_app_name"]
+  }
+
+  rule {
+    action = "set"
+    target_label = "environment"
+    source_labels = ["__meta_faro_attributes_app_environment"]
+  }
+}
+
+loki.write "default" {
+  input = loki.relabel.default.output
+
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
