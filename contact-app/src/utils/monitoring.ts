@@ -13,7 +13,7 @@ import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
 const initFaro = () => {
     initializeFaro({
-        url: import.meta.env.VITE_FARO, /// Your Grafana cloud
+        url: `http://localhost:8027/collect`,
         app: {
             name: 'frontend-app',
             version: '1.0.0',

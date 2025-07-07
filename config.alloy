@@ -1,0 +1,84 @@
+
+loki.process "logs_process_client" {
+  forward_to = [loki.write.logs_write_client.receiver]
+
+  stage.logfmt {
+      mapping = { "kind" = "", "service_name" = "", "app" = "" }
+  }
+
+  stage.labels {
+      values = { "kind" = "kind", "service_name" = "service_name", "app" = "app" }
+  }
+}
+
+loki.write "logs_write_client" {
+	endpoint {
+        url  = "http://loki:3100/loki/api/v1/push"
+	}
+	external_labels = {
+        }
+}
+
+
+local.file_match "logs_file_server" {
+	path_targets = [{
+		__address__ = "localhost",
+		__path__    = "/var/log/server.log",
+		app         = "@grafana/faro-demo-server",
+	}]
+}
+
+loki.source.file "logs_source_server" {
+	targets               = local.file_match.logs_file_server.targets
+	forward_to            = [loki.write.logs_write_server.receiver]
+	legacy_positions_file = "/tmp/positions-server.yaml"
+}
+
+loki.write "logs_write_server" {
+	endpoint {
+		url  = "http://loki:3100/loki/api/v1/push"
+	}
+	external_labels = {
+        }
+}
+
+logging {
+	level = "info"
+}
+
+faro.receiver "integrations_app_agent_receiver" {
+	extra_log_labels = {
+		app  = "@grafana/faro-demo-client",
+		kind = "",
+	}
+
+	server {
+		listen_address           = "0.0.0.0"
+		listen_port              = "8027"
+		cors_allowed_origins     = ["*"]
+		max_allowed_payload_size = "10MiB"
+
+		rate_limiting {
+			rate = 50
+		}
+	}
+
+	sourcemaps { }
+
+	output {
+		logs   = [loki.process.logs_process_client.receiver]
+		traces = []
+	}
+}
+
+otelcol.receiver.otlp "default" {
+	grpc {
+		include_metadata = true
+	}
+
+	output {
+		metrics = []
+		logs    = []
+		traces  = []
+	}
+}

@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   frontend:
     build:
@@ -8,17 +10,53 @@ services:
     networks:
       - observability
 
-  nginx:
-    image: nginx:alpine
+  grafana:
+    image: grafana/grafana:latest
     ports:
-      - "3101:80" 
+      - "3000:3000"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf 
+      - grafana-storage:/var/lib/grafana
     networks:
       - observability
-    depends_on:
-      - frontend 
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - observability
+
+  alloy:
+    image: grafana/alloy:latest
+    ports:
+      - "12345:12345"
+      - "8027:8027"
+    entrypoint:
+      - '/bin/alloy'
+      - 'run'
+      - '--server.http.listen-addr=0.0.0.0:12345'
+      - '--config.extra-args="-config.expand-env"'
+      - '/etc/alloy/config.alloy'
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+    networks:
+      - observability
+
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "3101:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - frontend
+  #     - alloy
+  #   networks:
+  #     - observability
+
+volumes:
+  grafana-storage:
 
 networks:
   observability:
-    driver: bridge
