@@ -4,6 +4,10 @@
   <b>If you find this project useful, please consider giving it a ⭐ star on GitHub!</b>
 </p>
 
+<p align="center">
+  <a href="https://mohammadtaheri.medium.com/observing-frontend-app-with-grafana-loki-part-1-57e201223ae3" target="_blank"><b>Read the Article: Observing Frontend App with Grafana & Loki (Part 1)</b></a>
+</p>
+
 ---
 
 > **Option 1: Use Grafana Cloud**
