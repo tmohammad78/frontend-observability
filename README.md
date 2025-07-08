@@ -1,4 +1,10 @@
-# Frontend Monitor
+# Frontend Observability
+
+<p align="center">
+  <b>If you find this project useful, please consider giving it a ⭐ star on GitHub!</b>
+</p>
+
+---
 
 > **Option 1: Use Grafana Cloud**
 >
