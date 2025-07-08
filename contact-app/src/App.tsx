@@ -30,8 +30,6 @@ function CardListPage() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err,'dd');
-        
         faro.api.pushEvent('Request failed', { url });
         setError(err.message);
         setLoading(false);
@@ -48,7 +46,7 @@ function CardListPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSrc('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80');
-    }, 5000); // Delay image load by 5 seconds
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -59,13 +57,6 @@ function CardListPage() {
     </div>
   )
   if (error) return <div>Error: {error}</div>;
-
-  const handleClick = () => {
-    const start = Date.now();
-    // Block main thread for 6000ms
-    while (Date.now() - start < 6000) {}
-    alert("Done blocking!");
-  };
   
   setTimeout(() => {
     setShow(true)
@@ -83,10 +74,9 @@ function CardListPage() {
           width="1200"
           height="800"
           loading="eager"
-          style={{ backgroundColor: '#ccc' }} // optional placeholder color
+          style={{ backgroundColor: '#ccc' }}
         />
       )}
-      <button onClick={handleClick}>click me</button>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
         {items.map((item) => (
           <Card
