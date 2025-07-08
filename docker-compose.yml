@@ -12,9 +12,14 @@ services:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - './infra/grafana/dashboards:/var/lib/grafana/dashboards'
+      - './infra/grafana/dashboards:/etc/grafana/provisioning/dashboards'
       - './infra/grafana/datasources:/etc/grafana/provisioning/datasources'
+      - './infra/grafana/config:/etc/grafana-config'
+      - './infra/grafana/config/grafana.ini:/etc/grafana/grafana.ini'
       - grafana-storage:/var/lib/grafana
     networks:
       - observability
